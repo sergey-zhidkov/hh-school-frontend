@@ -3,6 +3,9 @@
 
 <head>
     <title>Календарь</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
     <script type="text/javascript" src="js/libs/jquery-2.0.3.min.js"></script>
     <script type="text/javascript" src="js/calendar.js"></script>
     <script type="text/javascript" src="js/project.js"></script>
@@ -12,17 +15,25 @@
 
 
 <body>
-    <div class="header">
-
-    </div>
-
-    <div class="main">
-        <div class="navigation">
-
+    <div class="calendar-main" id="calendar">
+        <div class="calendar-header">
+            <input type="button" value="Добавить"/>
+            <input type="button" value="Обновить"/>
+            <input type="button" value="Лупа"/>
+            <input type="text" placeholder="Событие, дата или участник"/>
         </div>
 
-        <div class="calendar-wrapper">
+        <div class="calendar-events-wrapper">
+            <div class="calendar-navigator">
+                <input type="button" value="<"/>
+                <span>Август 2013</span>
+                <input type="button" value=">"/>
+                <input type="button" value="Сегодня"/>
+            </div>
 
+            <div class="calendar-events">
+
+            </div>
         </div>
     </div>
 </body>
