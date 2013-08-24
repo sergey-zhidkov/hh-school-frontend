@@ -3,7 +3,7 @@
     margin-left: auto;
     margin-right: auto;
     width: 1000px;
-    height: 803px;
+    height: 1000px;
 }
 
 .calendar-header {
@@ -21,46 +21,38 @@
     padding: 10px 0;
 }
 
+.calendar-show-month-year {
+    display: inline-block;
+    width: 140px;
+    text-align: center;
+}
+
 .calendar-events {
 
 }
 
 .calendar-events-row {
-    /*display: inline-block;*/
+    height: 114px;
     white-space: nowrap;
 }
 
-.calendar-events-row table {
-    border-collapse: collapse;
-    border-spacing: 0;
-}
-
-.calendar-events-row:first-child table {
+.calendar-events-row:first-child .cell {
     border-top: 1px solid #ebebeb;
 }
 
-.calendar-events-row td {
-    width: 128px;
-    height: 100px;
-    max-width: 128px;
-    max-height: 100px;
+.calendar-events-row .cell:first-child {
     border-left: 1px solid #ebebeb;
-    border-right: 1px solid #ebebeb;
-    border-bottom: 1px solid #ebebeb;
-}
-
-.calendar-events-row .cell {
-    border: 1px solid #ebebeb;
-    /*border-left: 1px solid #ebebeb;*/
 }
 
 .cell {
+    border-right: 1px solid #ebebeb;
+    border-bottom: 1px solid #ebebeb;
     /*box-sizing: border-box;*/
     display: inline-block;
-    min-width: 116px;
+    min-width: 114px;
     min-height: 100px;
     height: 100px;
     padding: 6px;
-    font-size: 9px;
+    font-size: 10px;
     color: #999999;
 }
