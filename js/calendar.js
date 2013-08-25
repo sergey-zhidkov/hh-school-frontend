@@ -98,7 +98,6 @@
         }
         this.currentMonth = month;
 
-        debugger;
         this.updateCalendarNavigator();
         this.updateEventsCalendar();
     };

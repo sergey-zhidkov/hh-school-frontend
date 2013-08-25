@@ -17,17 +17,21 @@
 <body>
     <div class="calendar-main" id="calendar">
         <div class="calendar-header">
-            <input type="button" value="Добавить" class="button-header"/>
-            <input type="button" value="Обновить" class="button-header"/>
-            <input type="button" value="Лупа"/>
-            <input type="text" placeholder="Событие, дата или участник"/>
+            <div class="calendar-control-block">
+                <input type="button" value="Добавить" class="button-control"/>
+                <input type="button" value="Обновить" class="button-control"/>
+            </div>
+            <div class="calendar-find-block">
+                <div class="button-magnifier"></div>
+                <input type="text" placeholder="Событие, дата или участник" class="input-find"/>
+            </div>
         </div>
 
         <div class="calendar-events-wrapper">
             <div class="calendar-navigator">
-                <input type="button" value="<" name="prev-month" class="button-navigator"/>
+                <input type="button" name="prev-month" class="button-navigator button-left"/>
                 <div name="navigator-text" class="calendar-show-month-year"></div>
-                <input type="button" value=">" name="next-month" class="button-navigator"/>
+                <input type="button" name="next-month" class="button-navigator button-right"/>
                 <input type="button" value="Сегодня" name="today" class="button-navigator"/>
             </div>
 
