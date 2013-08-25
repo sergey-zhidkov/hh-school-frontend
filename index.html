@@ -23,7 +23,7 @@
             </div>
             <div class="calendar-find-block">
                 <div class="button-magnifier"></div>
-                <input type="text" placeholder="Событие, дата или участник" class="input-find"/>
+                <input type="text" placeholder="Событие, дата или участник" class="input find"/>
             </div>
         </div>
 
@@ -37,6 +37,18 @@
 
             <div class="calendar-events">
 
+            </div>
+        </div>
+    </div>
+    <div id="bubble" class="bubble" style="display: none;">
+        <div class="bubble-content">
+            <div class="bubble-date" name="bubble-date"></div>
+            <input type="text" name="event-name" class="input bubble-input" placeholder="Событие"/>
+            <input type="text" name="peoples-names" class="input bubble-input" placeholder="Имена участников"/>
+            <textarea name="description" class="input bubble-input bubble-description" placeholder="Описание"></textarea>
+            <div>
+                <input class="bubble-button" type="button" name="add-event" value="Готово"/>
+                <input class="bubble-button" type="button" name="remove-event" value="Удалить"/>
             </div>
         </div>
     </div>
