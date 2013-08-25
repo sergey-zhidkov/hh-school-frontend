@@ -43,7 +43,7 @@
         this.container.addClass('calendar-wrapper');
 
         this.datesProcessor = new DatesProcessor();
-        this.eventsHandler = new EventsHandler();
+        this.eventsHandler = new EventsHandler(this);
         this.eventsHandler.setYear(this.datesProcessor.getCurrentYear());
         this.eventsHandler.setMonth(this.datesProcessor.getCurrentMonth());
 
@@ -128,10 +128,15 @@
         this.navigatorText.text(months[this.eventsHandler.getMonth()] + ' ' + this.eventsHandler.getYear());
     };
 
+    Calendar.prototype.updateView = function() {
+        this.updateEventsCalendar();
+    };
+
     Calendar.prototype.updateEventsCalendar = function() {
         this.cells.empty();
         this.insertDaysOfWeek(this.rows.eq(0));
         this.insertDaysOfMonth(this.eventsHandler.getYear(), this.eventsHandler.getMonth());
+        this.insertEvents();
         this.selectCurrentDay();
     };
 
@@ -145,14 +150,14 @@
 
     Calendar.prototype.createEventsRow = function() {
         var row = '<div class="calendar-events-row">' +
-                '<div class="monday cell"></div>' +
-                '<div class="tuesday cell"></div>' +
-                '<div class="wednesday cell"></div>' +
-                '<div class="thursday cell"></div>' +
-                '<div class="friday cell"></div>' +
-                '<div class="saturday cell"></div>' +
-                '<div class="sunday cell"></div>' +
-              '</div>'
+                    '<div class="monday cell"></div>' +
+                    '<div class="tuesday cell"></div>' +
+                    '<div class="wednesday cell"></div>' +
+                    '<div class="thursday cell"></div>' +
+                    '<div class="friday cell"></div>' +
+                    '<div class="saturday cell"></div>' +
+                    '<div class="sunday cell"></div>' +
+                  '</div>'
 
         return row;
     };
@@ -169,6 +174,16 @@
         var datesArray = this.eventsHandler.getDatesArray(year, month);
         this.cells.each(function(ind) {
             $(this).append('<span>' + datesArray[ind] + '</span>');
+        });
+    };
+
+    Calendar.prototype.insertEvents = function() {
+        var self = this;
+        this.cells.each(function(index) {
+            debugger;
+            var date = self.eventsHandler.getDateByIndex(index);
+            var eventText = self.eventsHandler.getFormattedEventByDate(date);
+            $(this).append('<br/>' + eventText);
         });
     };
 
@@ -190,13 +205,31 @@
      * EventsHandler
      * @constructor
      */
-    var EventsHandler = function() {
+    var EventsHandler = function(calendar) {
+        this.calendar = calendar;
+
         this.datesProcessor = new DatesProcessor();
         this.datesArray = null;
 
         this.year = 0;
         this.month = 0;
         this.date = 0;
+
+        this.events = {};
+        this.getEventsFromStorage();
+    };
+
+    EventsHandler.prototype.getEventsFromStorage = function() {
+        if ('localStorage' in window && window['localStorage'] !== null) {
+            this.events = localStorage.getItem('events');
+            this.events = this.events ? JSON.parse(this.events) : {};
+        }
+    };
+
+    EventsHandler.prototype.updateStorage = function() {
+        if ('localStorage' in window && window['localStorage'] !== null) {
+            localStorage.setItem('events', JSON.stringify(this.events));
+        }
     };
 
     EventsHandler.prototype.setYear = function(year) {
@@ -226,13 +259,48 @@
 
     EventsHandler.prototype.getDateByIndex = function(index) {
         var offsetDay = this.datesProcessor.getFirstDayOffsetInArray(this.year, this.month);
-        var daysInCurrentMonth = this.datesProcessor.getDaysInMonth(this.year, this.month);
         var month = this.month;
-        if (index < offsetDay) {
-            month--;
-        }
+        var daysInCurrentMonth = this.datesProcessor.getDaysInMonth(this.year, this.month);
+        if (index < offsetDay) { month--; }
+        if (index > (offsetDay + daysInCurrentMonth - 1)) { month++; }
         var date = this.datesArray[index];
         return new Date(this.year, month, date);
+    };
+
+    EventsHandler.prototype.addEvent = function(o) {
+        debugger;
+        var d = o.date;
+        this.events[d.getTime()] = {
+            event: o.event,
+            peoples: o.peoples,
+            description: o.description
+        };
+        this.updateStorage();
+        this.calendar.updateView();
+    };
+
+    EventsHandler.prototype.removeEvent = function(date) {
+        delete this.events[date.getTime()];
+        this.updateStorage();
+        this.calendar.updateView();
+    };
+
+    EventsHandler.prototype.getFormattedEventByDate = function(date) {
+        var time = date.getTime();
+        var evt = this.events[time];
+        var formattedEvt = '';
+
+        if (evt) {
+            formattedEvt += '<span class="event event-name">' + evt.event + '</span><br/>';
+            formattedEvt += '<span class="event event-peoples">' + evt.peoples + '</span><br/>';
+            formattedEvt += '<span class="event event-description">' + evt.description + '</span>';
+        }
+
+        return formattedEvt;
+    };
+
+    EventsHandler.prototype.getEvent = function(date) {
+        return this.events[date.getTime()];
     };
 
     /**
@@ -247,40 +315,79 @@
         this.eventInput = $('input[name="event-name"]', this.bubble);
         this.peoplesInput = $('input[name="peoples-names"]', this.bubble);
         this.descriptionInput = $('textarea[name="description"]', this.bubble);
+        this.addEventBtn = $('input[name="add-event"]', this.bubble);
+        this.removeEventBtn = $('input[name="remove-event"]', this.bubble);
 
         this.eventsHandler = eventsHandler;
         this.datesProcessor = new DatesProcessor();
 
-        this.addEvents();
+        this.index = 0;
+
+        this.addOnClickHandlers();
     };
 
-    BubbleHandler.prototype.addEvents = function() {
+    BubbleHandler.prototype.addOnClickHandlers = function() {
+        var self = this;
+        this.addEventBtn.on('click', function() {
+            var date = self.eventsHandler.getDateByIndex(self.index);
+            var event = self.eventInput.val().trim();
+            var peoples = self.peoplesInput.val().trim();
+            var description = self.descriptionInput.val().trim();
 
+            self.eventsHandler.addEvent({
+                date: date,
+                event: event,
+                peoples: peoples,
+                description: description
+            });
+
+            self.hide();
+        });
+
+        this.removeEventBtn.on('click', function() {
+            var date = self.eventsHandler.getDateByIndex(self.index);
+            self.eventsHandler.removeEvent(date);
+            self.hide();
+        });
     };
 
     BubbleHandler.prototype.show = function(cell) {
+        this.clear();
+        this.index = cell.data('index');
+
         var offset = cell.offset();
         var width = cell.outerWidth();
         var left = offset.left + width + 14;
         var top = offset.top - 14;
-        var b = this.bubble;
-        b.offset({top: top, left: left});
 
-        var index = cell.data('index');
-
-        this.fillDialog(index);
-
-        b.show();
+        this.fillDialog();
+        this.bubble.show();
+        this.bubble.offset({top: top, left: left});
     };
 
     BubbleHandler.prototype.hide = function() {
+        this.clear();
         this.bubble.hide();
     };
 
-    BubbleHandler.prototype.fillDialog = function(index) {
-        var date = this.eventsHandler.getDateByIndex(index);
+    BubbleHandler.prototype.clear = function() {
+        this.dateDiv.text('');
+        this.eventInput.val('');
+        this.peoplesInput.val('');
+        this.descriptionInput.val('');
+    };
+
+    BubbleHandler.prototype.fillDialog = function() {
+        var date = this.eventsHandler.getDateByIndex(this.index);
         var selectedDateText = this.datesProcessor.getFormattedDateText(date);
         this.dateDiv.text(selectedDateText);
+
+        var evt = this.eventsHandler.getEvent(date);
+        if (evt) {
+            this.eventInput.val(evt.event);
+            this.peoplesInput.val(evt.peoples);
+            this.descriptionInput.val(evt.description);
+        }
     };
 
     /**

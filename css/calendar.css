@@ -147,10 +147,14 @@ body {
     display: inline-block;
     min-width: 114px;
     min-height: 100px;
+    max-width: 114px;
+    max-height: 100px;
     height: 100px;
     padding: 6px;
     font-size: 10px;
     color: #999999;
+    overflow: hidden;
+    vertical-align: bottom;
 }
 
 .current-day {
@@ -214,4 +218,12 @@ body {
 .bubble-button {
     width: 80px;
     font-size: 12px;
+}
+
+.event {
+    color: #000000;
+}
+
+.event-name {
+    font-weight: bold;
 }
