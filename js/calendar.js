@@ -110,6 +110,7 @@
         this.cells.empty();
         this.insertDaysOfWeek(this.rows.eq(0));
         this.insertDaysOfMonth(this.currentYear, this.currentMonth);
+        this.selectCurrentDay();
     };
 
     Calendar.prototype.createEventsRows = function(container) {
@@ -149,22 +150,27 @@
         });
     };
 
+    Calendar.prototype.selectCurrentDay = function() {
+        this.cells.removeClass('current-day');
 
-    var DatesProcessor = function() {
-        this.init();
+        var year = this.datesProcessor.getCurrentYear();
+        var month = this.datesProcessor.getCurrentMonth();
+
+        if (year === this.currentYear && month === this.currentMonth) {
+            var date = this.datesProcessor.getCurrentDate();
+            var index = this.datesProcessor.getFirstDayOffsetInArray(year, month);
+            index += (date - 1);
+            this.cells.eq(index).addClass('current-day');
+        }
     };
 
-    DatesProcessor.prototype.init = function() {
 
+    var DatesProcessor = function() {
     };
 
     DatesProcessor.prototype.getDatesArray = function(year, month) {
         var maxLen = COLS * ROWS;
-        var date = new Date(year, month, 1);
-        var day = date.getDay();
-        // monday - is a first day of the week
-        if (day === 0) { day = 7; }
-        day -= 1;
+        var day = this.getFirstDayOffsetInArray(year, month);
         var daysInCurrentMonth = this.getDaysInMonth(year, month);
         var daysInMonthBefore = this.getDaysInMonth(year, month - 1);
 
@@ -191,12 +197,26 @@
         return datesArray;
     };
 
+    DatesProcessor.prototype.getFirstDayOffsetInArray = function(year, month) {
+        var date = new Date(year, month, 1);
+        var day = date.getDay();
+        // monday - is a first day of the week
+        if (day === 0) { day = 7; }
+        day -= 1;
+
+        return day;
+    };
+
     DatesProcessor.prototype.getCurrentYear = function() {
         return (new Date()).getFullYear();
     };
 
     DatesProcessor.prototype.getCurrentMonth = function() {
         return (new Date()).getMonth();
+    };
+
+    DatesProcessor.prototype.getCurrentDate = function() {
+        return (new Date()).getDate();
     };
 
     DatesProcessor.prototype.getDaysInMonth = function(year, month) {
